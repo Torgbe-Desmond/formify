@@ -1,7 +1,7 @@
 # ─────────────────────────────────────────────────────────────────
 # Stage 1: Build
 # ─────────────────────────────────────────────────────────────────
-FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 
 WORKDIR /src
 
@@ -45,7 +45,7 @@ RUN dotnet publish src/FastTransfers.API/FastTransfers.API.csproj \
 # ─────────────────────────────────────────────────────────────────
 # Stage 3: Runtime
 # ─────────────────────────────────────────────────────────────────
-FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS runtime
+FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS runtime
 
 # Create a non-root user for security
 RUN addgroup --system appgroup && adduser --system --ingroup appgroup appuser
