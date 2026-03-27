@@ -7,6 +7,7 @@ using FastTransfers.Infrastructure.Storage;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using MongoDB.Driver;
 
 namespace FastTransfers.Infrastructure;
 
@@ -36,14 +37,35 @@ public static class DependencyInjection
         //   "Database" → SQL Server FileContents table
         //   "Local"    → local filesystem (uploads folder)
         //   "MongoDB"  → MongoDB collection
+        // ── Storage ───────────────────────────────────────────
         var provider = config["Storage:Provider"] ?? "Database";
 
         if (provider == "Local")
+        {
             services.AddScoped<IFileStorageService, LocalStorageService>();
+        }
         else if (provider == "MongoDB")
-            services.AddSingleton<IFileStorageService, MongoDbStorageService>();
+        {
+            // This is the important part for MongoDB
+            var mongoConnectionString = config["Storage:MongoDB:ConnectionString"];
+
+            if (string.IsNullOrWhiteSpace(mongoConnectionString))
+            {
+                throw new InvalidOperationException("MongoDB ConnectionString is missing from configuration. Check .env or environment variables.");
+            }
+
+            // You can also get DatabaseName and CollectionName if needed
+            var mongoDatabaseName = config["Storage:MongoDB:DatabaseName"] ?? "Formify";
+            var mongoCollectionName = config["Storage:MongoDB:CollectionName"] ?? "fileContents";
+
+            // Register MongoDB services here (example)
+            services.AddSingleton<IMongoClient>(sp => new MongoClient(mongoConnectionString));
+            services.AddScoped<IFileStorageService, MongoDbStorageService>();
+        }
         else
+        {
             services.AddScoped<IFileStorageService, DatabaseStorageService>();
+        }
 
         // ── Identity ──────────────────────────────────────────
         services.AddScoped<IJwtService, JwtService>();

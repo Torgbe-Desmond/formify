@@ -60,6 +60,16 @@ public class FoldersController : BaseController
         await _mediator.Send(new DeleteFolderCommand(id, UserId), ct);
         return NoContent();
     }
+
+    /// <summary>Get a folder by Id.</summary>
+    [HttpGet("folder/{id:guid}")]
+    [ProducesResponseType(typeof(FolderDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetFolderById(Guid id, CancellationToken ct)
+    {
+        var result = await _mediator.Send(new GetFolderByIdWithProjectQuery(id), ct);
+        return Ok(result);
+    }
 }
 
 public record FolderNameRequest(string Name);

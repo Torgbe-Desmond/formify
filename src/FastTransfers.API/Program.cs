@@ -5,8 +5,12 @@ using FastTransfers.Infrastructure;
 using FastTransfers.Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Serilog;
+using dotenv.net;   
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Load .env file (only affects local development)
+DotEnv.Load();   
 
 // ── Serilog ───────────────────────────────────────────────────────
 Log.Logger = new LoggerConfiguration()
